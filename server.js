@@ -1,17 +1,32 @@
 
+// File: server.js
 const express = require('express');
-const path = require('path');
+const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = 4000;
 
-// Serve static files from React frontend
-app.use(express.static(path.join(__dirname, 'client/build')));
+app.use(cors());
+app.use(express.json());
 
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+// Define fruits for matching pairs
+const fruits = [
+  '🍎', '🍊', '🍌', '🍇', '🍉', '🍒',
+  '🍍', '🥭', '🥝', '🍓', '🍋', '🍑',
+  '🥥', '🍐', '🍏', '🫐', '🍈', '🍔'
+];
+
+// Shuffle the array and generate pairs
+const generateCards = () => {
+  const selectedFruits = fruits.slice(0, 18); // Use only 18 fruits
+  const pairs = [...selectedFruits, ...selectedFruits];
+  return pairs.sort(() => Math.random() - 0.5); // Shuffle
+};
+
+// Endpoint to generate cards
+app.get('/generate-cards', (req, res) => {
+  const shuffledCards = generateCards();
+  res.json({ cards: shuffledCards });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
